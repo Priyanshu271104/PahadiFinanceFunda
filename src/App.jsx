@@ -2,10 +2,12 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { FaInstagram, FaFacebookF } from "react-icons/fa";
+import { FaInstagram, FaFacebookF, FaYoutube } from "react-icons/fa";
 import poster from "./assets/poster.jpg";
 import advisorVideo from "./assets/advisor-video.mp4";
 import retirementVideo from "./assets/retirement.mp4";
+import childrenInvestmentVideo from "./assets/Children_investment.mp4";
+import healthInsuranceVideo from "./assets/Heath_insurance.mp4";
 
 import {
   ShieldCheck,
@@ -37,7 +39,6 @@ export default function App() {
       <TrustStrip />
       <Services />
       <WhyInvestEarly />
-      <ChildEducationPlanning />
       <RetirementSection />
       <AdvisorVideo />
       <HowItWorks />
@@ -195,21 +196,6 @@ const WhyInvestEarly = () => (
   </div>
 );
 
-const ChildEducationPlanning = () => (
-  <div className="py-24 bg-gray-50">
-    <div className="max-w-6xl mx-auto px-6 text-center">
-      <h2 className="text-3xl font-bold">Child Education Planning</h2>
-
-      <p className="text-gray-600 mt-6 max-w-3xl mx-auto leading-relaxed">
-        Investing early for your child’s education helps beat rising education
-        inflation and avoids future financial burden. Small monthly investments
-        today can create a strong education fund tomorrow—ensuring your child’s
-        dreams are never limited by money.
-      </p>
-    </div>
-  </div>
-);
-
 const RetirementSection = () => (
   <div className="py-24 bg-white">
     <div className="max-w-6xl mx-auto px-6 text-center">
@@ -301,6 +287,12 @@ const services = [
     title: "Health Insurance",
     short: "Protect savings from medical emergencies.",
     long: "Health insurance ensures quality treatment without financial stress by covering hospitalization, treatments, and rising healthcare costs.",
+  },
+  {
+    icon: <ShieldCheck />,
+    title: "Child Education Planning",
+    short: "Build a bright future for your child's education.",
+    long: "Investing early for your child's education helps manage rising education costs and build a dedicated fund for their future dreams.",
   },
   {
     icon: <PieChart />,
@@ -556,6 +548,17 @@ const FloatingSocials = () => (
     >
       <FaFacebookF size={20} />
     </a>
+
+    {/* YouTube */}
+    <a
+      href="https://www.youtube.com/@suchijoshi86"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Visit our YouTube channel"
+      className="bg-red-600 text-white p-4 rounded-full shadow-lg hover:scale-110 transition"
+    >
+      <FaYoutube size={20} />
+    </a>
   </div>
 );
 
@@ -569,10 +572,12 @@ const Footer = () => (
 );
 
 const Services = () => {
-  const [showRetirementVideo, setShowRetirementVideo] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(null);
 
-  const closeRetirementVideo = () => {
-    setShowRetirementVideo(false);
+  const serviceVideos = {
+    "Retirement Planning": retirementVideo,
+    "Child Education Planning": childrenInvestmentVideo,
+    "Health Insurance": healthInsuranceVideo,
   };
 
   return (
@@ -590,8 +595,7 @@ const Services = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-14">
             {services.map((service, i) => {
-              const isRetirement = service.title === "Retirement Planning";
-
+              const videoSrc = serviceVideos[service.title];
               return (
                 <div key={i} className="group [perspective:1000px] h-[320px]">
                   <div className="relative h-full w-full rounded-2xl transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
@@ -619,11 +623,14 @@ const Services = () => {
                       </p>
 
                       {/* WATCH VIDEO BUTTON - ONLY RETIREMENT */}
-                      {isRetirement && (
+                      {videoSrc && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setShowRetirementVideo(true);
+                            setActiveVideo({
+                              title: service.title,
+                              src: videoSrc,
+                            });
                           }}
                           className="mt-6 mx-auto flex items-center gap-2 bg-white text-blue-900 px-5 py-2.5 rounded-xl font-semibold shadow-md hover:scale-105 hover:shadow-lg transition-all duration-300"
                         >
@@ -640,26 +647,32 @@ const Services = () => {
       </div>
 
       {/* RETIREMENT VIDEO POPUP */}
-      {showRetirementVideo && (
+
+      {activeVideo && (
         <div
-          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={closeRetirementVideo}
+          className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setActiveVideo(null)}
         >
           <div
             className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* CLOSE BUTTON */}
-            <button
-              onClick={closeRetirementVideo}
-              className="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-black/70 text-white text-xl flex items-center justify-center hover:bg-black transition"
-            >
-              ✕
-            </button>
+            <div className="flex items-center justify-between bg-blue-900 text-white px-5 py-3">
+              <h3 className="font-semibold">{activeVideo.title}</h3>
 
-            {/* VIDEO */}
+              <button
+                type="button"
+                onClick={() => setActiveVideo(null)}
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition"
+                aria-label="Close video"
+              >
+                ✕
+              </button>
+            </div>
+
             <video
-              src={retirementVideo}
+              key={activeVideo.src}
+              src={activeVideo.src}
               controls
               autoPlay
               playsInline
